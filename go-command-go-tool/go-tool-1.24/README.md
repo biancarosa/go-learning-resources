@@ -1,0 +1,1 @@
+-> go get -tool honnef.co/go/tools/cmd/staticcheck
