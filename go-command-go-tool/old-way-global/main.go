@@ -23,7 +23,8 @@ func (f *Fibonacci) Calc(n int) int {
 func main() {
 	logrus.SetLevel(logrus.DebugLevel)
 	fib := NewFibonacci()
-	for i := 0; i < 10; i++ {
+	nums := make([]int, 10)
+	for i := range nums {
 		result := fib.Calc(i)
 		logrus.WithFields(logrus.Fields{
 			"n":     i,
@@ -31,4 +32,14 @@ func main() {
 		}).Info("Fibonacci calculated")
 		fmt.Printf("fib(%d) = %d\n", i, result)
 	}
+
+	// go vet
+	x := 5
+	fmt.Printf("The value is %s\n", x)
+
+}
+
+// staticcheck
+func unusedFunc() {
+	fmt.Println("I am never called")
 }
