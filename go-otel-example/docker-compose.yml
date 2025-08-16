@@ -1,0 +1,84 @@
+services:
+  go-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - otel-collector
+    networks:
+      - otel-network
+    restart: unless-stopped
+    # Add DNS configuration to ensure service discovery works
+    dns_search: .
+    # Optionally, you can add explicit hostname for the API service
+    hostname: go-api
+    # Add health check to ensure the service is working
+    healthcheck:
+      test: ["CMD", "wget", "-O", "/dev/null", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel/otel-collector-config.yml:/etc/otel-collector-config.yml
+    environment:
+      - HONEYCOMB_API_KEY=${HONEYCOMB_API_KEY}
+      - HONEYCOMB_DATASET=${HONEYCOMB_DATASET}
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus exporter
+    networks:
+      - otel-network
+    restart: unless-stopped
+    # Add explicit hostname for the collector service
+    hostname: otel-collector
+    # Add health check for the collector
+    healthcheck:
+      test: ["CMD", "wget", "-O", "/dev/null", "http://localhost:13133"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+    networks:
+      - otel-network
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    command: ["--collector.zipkin.host-port=:9411"]
+    ports:
+      - "16686:16686"  # UI
+      - "14250:14250"  # gRPC
+      - "9411:9411"    # Zipkin
+    networks:
+      - otel-network
+    restart: unless-stopped
+
+networks:
+  otel-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
