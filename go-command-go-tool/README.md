@@ -1,11 +1,13 @@
 # go-command-go-tool
 
+- https://tip.golang.org/doc/go1.24
+
 # staticcheck
 
 
 - `staticcheck`` - https://github.com/dominikh/go-tools#installation
 
-- go install honnef.co/go/tools/cmd/staticcheck@2022.1
 
 # vet
 
+`go vet` vs `go tool vet`

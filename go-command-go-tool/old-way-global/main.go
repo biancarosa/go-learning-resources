@@ -36,7 +36,6 @@ func main() {
 	// go vet
 	x := 5
 	fmt.Printf("The value is %s\n", x)
-
 }
 
 // staticcheck

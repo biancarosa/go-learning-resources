@@ -7,6 +7,4 @@
 
 -> cat tools.go | grep _ | awk -F'"' '{print $2}' | xargs -tI % go install %
 
-
-
-(https://marcofranssen.nl/manage-go-tools-via-go-modules)
+Artigo: https://marcofranssen.nl/manage-go-tools-via-go-modules
