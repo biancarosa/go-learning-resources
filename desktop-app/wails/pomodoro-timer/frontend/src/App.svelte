@@ -1,21 +1,29 @@
 <script>
   import logo from './assets/images/logo-universal.png'
-  import {Greet} from '../wailsjs/go/main/App.js'
+  import {StartTimer, StopTimer} from '../wailsjs/go/main/App.js'
 
-  let resultText = "Please enter your name below 👇"
-  let name
+  let isRunning = false
+  let statusText = "Timer is stopped"
 
-  function greet() {
-    Greet(name).then(result => resultText = result)
+  function toggleTimer() {
+    if (isRunning) {
+      StopTimer()
+      statusText = "Timer is stopped"
+    } else {
+      StartTimer()
+      statusText = "Timer is running"
+    }
+    isRunning = !isRunning
   }
 </script>
 
 <main>
   <img alt="Wails logo" id="logo" src="{logo}">
-  <div class="result" id="result">{resultText}</div>
+  <div class="result" id="result">{statusText}</div>
   <div class="input-box" id="input">
-    <input autocomplete="off" bind:value={name} class="input" id="name" type="text"/>
-    <button class="btn" on:click={greet}>Greet</button>
+    <button class="btn" on:click={toggleTimer}>
+      {isRunning ? 'Stop' : 'Start'}
+    </button>
   </div>
 </main>
 
